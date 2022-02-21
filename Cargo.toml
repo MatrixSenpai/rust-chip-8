@@ -1,0 +1,8 @@
+[package]
+name = "chip-8"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { version = "0.6.0", features = ["dynamic"] }
+bevy_ecs_tilemap = "0.5.0"
