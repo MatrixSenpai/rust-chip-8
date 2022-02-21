@@ -42,7 +42,7 @@ fn main() {
         .add_system(load_display)
         .add_system_set(
             SystemSet::new()
-                .with_run_criteria(FixedTimestep::step(0.5))
+                .with_run_criteria(FixedTimestep::step(0.002))
                 .with_system(tick_cpu)
         )
         .run();
