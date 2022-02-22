@@ -18,7 +18,7 @@ const WINDOW_HEIGHT: f32 = ((hardware::VRAM_HEIGHT as u32) * SCALE_FACTOR) as f3
 fn main() {
     let mut cpu = hardware::CPU::new();
 
-    let mut card = File::open("./roms/IBM Logo.ch8").expect("file not found");
+    let mut card = File::open("./roms/PONG").expect("file not found");
     let mut buffer = [0u8; 3584];
     let bytes_read = if let Ok(bytes_read) = card.read(&mut buffer) {
         bytes_read
@@ -100,6 +100,62 @@ fn load_display(cpu: Res<hardware::CPU>, mut query: Query<(&mut Tile, &TileParen
     }
 }
 
-fn tick_cpu(cpu: ResMut<hardware::CPU>) {
-    cpu.into_inner().cycle();
+fn tick_cpu(cpu: ResMut<hardware::CPU>, keyboard: Res<Input<KeyCode>>) {
+    let keys = translate_keys(keyboard);
+    cpu.into_inner().cycle(keys);
+}
+
+fn translate_keys(keyboard: Res<Input<KeyCode>>) -> [u8; 16] {
+    let mut keys = [0; 16];
+
+    if keyboard.pressed(KeyCode::Key1) {
+        keys[0] = 1;
+    }
+    if keyboard.pressed(KeyCode::Key2) {
+        keys[1] = 1;
+    }
+    if keyboard.pressed(KeyCode::Key3) {
+        keys[2] = 1;
+    }
+    if keyboard.pressed(KeyCode::Key4) {
+        keys[3] = 1;
+    }
+    if keyboard.pressed(KeyCode::Q) {
+        keys[4] = 1;
+    }
+    if keyboard.pressed(KeyCode::W) {
+        keys[5] = 1;
+    }
+    if keyboard.pressed(KeyCode::E) {
+        keys[6] = 1;
+    }
+    if keyboard.pressed(KeyCode::R) {
+        keys[7] = 1;
+    }
+    if keyboard.pressed(KeyCode::A) {
+        keys[8] = 1;
+    }
+    if keyboard.pressed(KeyCode::S) {
+        keys[9] = 1;
+    }
+    if keyboard.pressed(KeyCode::D) {
+        keys[10] = 1;
+    }
+    if keyboard.pressed(KeyCode::F) {
+        keys[11] = 1;
+    }
+    if keyboard.pressed(KeyCode::Z) {
+        keys[12] = 1;
+    }
+    if keyboard.pressed(KeyCode::X) {
+        keys[13] = 1;
+    }
+    if keyboard.pressed(KeyCode::C) {
+        keys[14] = 1;
+    }
+    if keyboard.pressed(KeyCode::V) {
+        keys[15] = 1;
+    }
+
+    keys
 }
