@@ -1,4 +1,5 @@
 use std::ops::AddAssign;
+use crate::hardware::instruction::Instruction;
 use super::*;
 
 const STACK_SIZE: usize = 16;
@@ -71,9 +72,10 @@ impl Engine {
 
     pub fn tick(&mut self) {
         let instruction = self.fetch();
-        let increment = self.decode_and_execute(instruction);
+        let instruction = self.decode(instruction);
+        let increment = self.execute(instruction);
 
-        self.program_counter += instruction;
+        self.program_counter += increment;
     }
 
     fn fetch(&self) -> u16 {
@@ -86,21 +88,9 @@ impl Engine {
         instruction
     }
 
-    fn decode_and_execute(&mut self, instruction: u16) -> u16 {
-        let high_byte = ((instruction & 0xFF00) >> 8) as u8;
-        let low_byte = (instruction & 0x00FF) as u8;
+    fn decode(&self, instruction: u16) -> Instruction { Instruction::from(instruction) }
 
-        let opcode = (high_byte & 0xF0) >> 4;
-        let x = high_byte & 0x0F;
-        let y = (low_byte & 0xF0) >> 4;
-        let n = low_byte & 0x0F;
-
-        let system_address = instruction & 0x0FFF;
-
-        match (high_byte, low_byte) {
-
-            _ => unreachable!("Unknown instruction!!")
-        }
+    fn execute(&mut self, instruction: Instruction) -> u16 {
 
         1
     }
@@ -125,4 +115,5 @@ impl Engine {
 #[derive(Debug)]
 pub enum EngineError {
     OutOfBounds,
+    UnknownInstructionType
 }
