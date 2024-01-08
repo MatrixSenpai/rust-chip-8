@@ -26,7 +26,7 @@ fn main() -> Result<(), SystemError> {
         .load_game(import)
         .map_err(|e| SystemError::EngineError(e))?;
 
-    engine.borrow_mut().tick();
+    while let Ok(_) = engine.borrow_mut().tick() {}
 
     Ok(())
 }

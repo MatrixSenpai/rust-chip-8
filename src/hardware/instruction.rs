@@ -1,14 +1,16 @@
+use std::fmt::{Display, Formatter};
 use crate::hardware::engine::EngineError;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Instruction(u16);
 impl Instruction {
     /// Returns the wrapped value
+    #[allow(dead_code)]
     pub fn instruction(&self) -> u16 { self.0 }
 
     /// Extracts opcode from instruction (first nibble)
     pub fn opcode(&self) -> u8 {
-        (self.0 & 0xF000) as u8
+        ((self.0 & 0xF000) >> 12) as u8
     }
 
     /// Extracts the highest byte from the instruction
@@ -35,10 +37,25 @@ impl From<u16> for Instruction {
        Self(value)
     }
 }
+impl Display for Instruction {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{:X} / {:?}: ADDR({:X}) OPCODE({:X}) X({:X}) Y({:X}) N({:X})",
+            self.0,
+            self.instruction_type(),
+            self.address(),
+            self.opcode(),
+            self.x(),
+            self.y(),
+            self.lowest_nibble(),
+        )
+    }
+}
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq)]
 #[allow(non_camel_case_types)]
-enum InstructionType {
+pub enum InstructionType {
     /// 0nnn System address call
     SYS,
     /// 00E0 Clear screen
@@ -124,6 +141,39 @@ impl TryFrom<&Instruction> for InstructionType {
         let result = match match_items {
             (0x0, 0x0, 0xE, 0x0) => Self::CLS,
             (0x0, 0x0, 0xE, 0xE) => Self::RET,
+            (0x0, _, _, _) => Self::SYS,
+            (0x1, _, _, _) => Self::JPA,
+            (0x2, _, _, _) => Self::CALL,
+            (0x3, _, _, _) => Self::SEV,
+            (0x4, _, _, _) => Self::SNEV,
+            (0x5, _, _, 0x0) => Self::SER,
+            (0x6, _, _, _) => Self::LDV,
+            (0x7, _, _, _) => Self::ADDV,
+            (0x8, _, _, 0x0) => Self::LDR,
+            (0x8, _, _, 0x1) => Self::ORR,
+            (0x8, _, _, 0x2) => Self::ANDR,
+            (0x8, _, _, 0x3) => Self::XORR,
+            (0x8, _, _, 0x4) => Self::ANDR_CARRY,
+            (0x8, _, _, 0x5) => Self::SUBR_BORROW,
+            (0x8, _, _, 0x6) => Self::SHR_STORE,
+            (0x8, _, _, 0x7) => Self::SUBR_BORROW_REVERSE,
+            (0x8, _, _, 0xE) => Self::SHL_STORE,
+            (0x9, _, _, 0) => Self::SNER,
+            (0xA, _, _, _) => Self::LDA,
+            (0xB, _, _, _) => Self::JPAD,
+            (0xC, _, _, _) => Self::RND,
+            (0xD, _, _, _) => Self::DRW,
+            (0xE, _, 0x9, 0xE) => Self::SKPK,
+            (0xE, _, 0xA, 0x1) => Self::SKPNK,
+            (0xF, _, 0x0, 0x7) => Self::LDD,
+            (0xF, _, 0x0, 0xA) => Self::LDK,
+            (0xF, _, 0x1, 0x5) => Self::LDDR,
+            (0xF, _, 0x1, 0x8) => Self::LDSR,
+            (0xF, _, 0x1, 0xE) => Self::ADDI,
+            (0xF, _, 0x2, 0x9) => Self::LDSPR,
+            (0xF, _, 0x3, 0x3) => Self::LDBR,
+            (0xF, _, 0x5, 0x5) => Self::LDIR,
+            (0xF, _, 0x6, 0x5) => Self::LDMR,
 
             _ => return Err(Self::Error::UnknownInstructionType)
         };
