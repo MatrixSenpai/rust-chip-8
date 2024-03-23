@@ -35,7 +35,7 @@ impl Engine {
             sound_timer: 0,
             register_i: 0,
 
-            internal_display: Vec::new(),
+            internal_display: vec![0; 64 * 32],
         };
 
         new_instance.load_font()?;

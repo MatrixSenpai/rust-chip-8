@@ -68,7 +68,7 @@ impl Engine {
 
     /// 00E0 Clear the display
     fn cls_00e0(&mut self) -> NextAddress {
-        self.internal_display = Vec::new();
+        self.internal_display = vec![0; 32 * 64];
 
         NextAddress::DefaultIncrement
     }
