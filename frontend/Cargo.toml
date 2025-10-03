@@ -1,0 +1,16 @@
+[package]
+name = "frontend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bevy = "0.17.1"
+bevy_ecs_tilemap = "0.17.0-rc.1"
+bevy-inspector-egui = "0.34.0"
+chip-8 = { path = "../chip-8" }
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
