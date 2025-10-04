@@ -40,7 +40,7 @@ mod macros {
 #[derive(Copy, Clone, Debug)]
 pub struct Chip8Emulator {
     pub(crate) memory: [u8; MEMORY_SIZE],
-    pub display_ram: [u8; DISPLAY_WIDTH * DISPLAY_HEIGHT],
+    pub display_ram: [u8; DISPLAY_WIDTH * DISPLAY_HEIGHT + 1],
 
     pub(crate) v_registers: [u8; REGISTER_COUNT],
     pub(crate) i_register: u16,
@@ -64,7 +64,7 @@ impl Chip8Emulator {
 
         Self {
             memory,
-            display_ram: [0xFF; DISPLAY_WIDTH * DISPLAY_HEIGHT],
+            display_ram: [0xFF; DISPLAY_WIDTH * DISPLAY_HEIGHT + 1],
             v_registers: [0; REGISTER_COUNT],
             i_register: 0,
             delay_register: 0,

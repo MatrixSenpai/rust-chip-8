@@ -5,7 +5,7 @@ use crate::macros::mask;
 impl Chip8Emulator {
     // 0x00E0
     pub(crate) fn clear_screen(&mut self, _instruction: u16) {
-        self.display_ram = [0; DISPLAY_WIDTH * DISPLAY_HEIGHT];
+        self.display_ram = [0; DISPLAY_WIDTH * DISPLAY_HEIGHT + 1];
     }
     // 0x00EE
     pub(crate) fn return_from_subroutine(&mut self, _instruction: u16) {
@@ -112,7 +112,7 @@ impl Chip8Emulator {
     // 0x8xyE
     pub(crate) fn shl_xy(&mut self, instruction: u16) {
         let x = mask!(1, instruction);
-        self.v_registers[0xF] = self.v_registers[x] & 0x80;
+        self.v_registers[0xF] = if (self.v_registers[x] & 0x80) > 0 { 1 } else { 0 };
         self.v_registers[x] <<= 1;
     }
 
@@ -154,8 +154,11 @@ impl Chip8Emulator {
             let byte = self.memory[self.i_register as usize + row];
 
             for col in 0..8 {
+                let mut index = (y_pos + row) * DISPLAY_WIDTH + (x_pos + col);
+                if index >= 2048 { index = 2047 };
+
                 let pixel = byte & (0x80 >> col);
-                let screen_pixel = &mut self.display_ram[(y_pos + row) * DISPLAY_WIDTH + (x_pos + col)];
+                let screen_pixel = &mut self.display_ram[index];
 
                 if pixel > 0 {
                     if *screen_pixel == 0xFF {
